@@ -1,8 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { updatedUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UsersController {
+
     /*
     GET /users
     GET /users/:id
@@ -13,13 +16,9 @@ export class UsersController {
 
     constructor(private readonly usersService: UsersService) {}
 
-    @Get() //quey params ---> /users?role=value&age=42
-    findAll() {
-        return [this.usersService.findAll()]    
-    }
-
     @Get()
-    findAllQ(@Query('role') role?: "INTERN" | "ENGINEER" | "ADMIN") {
+    findAll(@Query('role') role?: "INTERN" | "ENGINEER" | "ADMIN") {
+        console.log("role in cont: ", role);
         return [this.usersService.findAll(role)]
     }
 
@@ -29,14 +28,14 @@ export class UsersController {
     }
 
     @Post()
-    create(@Body() user: { name: string, email: string, role: 'INTERN' |
-    'ENGINEER' | 'ADMIN'}) {
+    create(@Body() user: CreateUserDto/*{ name: string, email: string, role: 'INTERN' |
+    'ENGINEER' | 'ADMIN'}*/) {
         return this.usersService.create(user);
     }
 
     @Patch(':id') 
-    patchUser(@Param('id') id: string, @Body() userUpdate: { name?: string,
-    email?: string, role?: 'INTERN' |'ENGINEER' | 'ADMIN'} ) {
+    patchUser(@Param('id') id: string, @Body() userUpdate: updatedUserDto/*{ name?: string,
+    email?: string, role?: 'INTERN' |'ENGINEER' | 'ADMIN'}*/ ) {
         console.log("/:id is: ", id);
         return { id, ...userUpdate }
     }

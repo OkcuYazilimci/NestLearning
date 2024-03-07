@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { updatedUserDto } from './dto/update-user.dto';
 
 @Injectable() //attach meta data
 export class UsersService {
@@ -11,7 +13,7 @@ export class UsersService {
         },
         {
             "id": 2,
-            "name": "Caglar Kilcipglu",
+            "name": "Caglar Kilcioglu",
             "email": "caglar.kilcioglu@arcelik.com",
             "role": "ADMIN",
         },
@@ -24,7 +26,9 @@ export class UsersService {
     ]
 
     findAll(role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
+        console.log("role is: " , role);
         if (role) {
+            
             return this.users.filter(user => user.role === role)
         }
         return this.users;
@@ -36,8 +40,7 @@ export class UsersService {
         return user;
     }
 
-    create(user: {name: string, email: string, role: 'INTERN' |
-     'ENGINEER' | 'ADMIN'}) {
+    create(user: CreateUserDto) {
         const userByHighId = [...this.users].sort((a,b) => b.id = a.id)
         const newUser = {
             id: userByHighId[0].id + 1,
@@ -47,8 +50,7 @@ export class UsersService {
         return newUser;
     }
 
-    update(id: number, updatedUser: {name?: string, email?: string, role?: 'INTERN' |
-    'ENGINEER' | 'ADMIN'}) {
+    update(id: number, updatedUser: updatedUserDto) {
         this.users = this.users.map(user => {
             if (user.id === id) {
                 return {...user, ...updatedUser}
