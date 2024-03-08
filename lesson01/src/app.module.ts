@@ -9,7 +9,7 @@ import mongoose from 'mongoose';
 @Module({
   imports: [
     ConfigModule.forRoot({isGlobal: true}),
-    MongooseModule.forRoot(process.env.MONGO_URI),
+    MongooseModule.forRoot(`${process.env.MONGO_URI}:${process.env.MONGO_PORT}`),
     UsersModule,
   ],
   controllers: [AppController],
@@ -18,15 +18,6 @@ import mongoose from 'mongoose';
 
 export class AppModule {
   constructor() {
-    this.connectToDB;
-  }
-
-  private async connectToDB() {
-    try {
-      await mongoose.connect(process.env.MONGO_URI);
-      console.log("connected to DB");
-    } catch (err) {
-      console.log(err);
-    }
+    console.log(`DB is working on ${process.env.MONGO_PORT}`)
   }
 }
