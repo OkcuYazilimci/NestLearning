@@ -1,74 +1,60 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { updatedUserDto } from './dto/update-user.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Roles, User } from './users.schema';
+import mongoose from 'mongoose';
 
 @Injectable() //attach meta data
 export class UsersService {
-    private users = [
-        {
-            "id": 1,
-            "name": "Umut Uygun",
-            "email": "umut.uygun@arcelik.com",
-            "role": "ENGINEER",
-        },
-        {
-            "id": 2,
-            "name": "Caglar Kilcioglu",
-            "email": "caglar.kilcioglu@arcelik.com",
-            "role": "ADMIN",
-        },
-        {
-            "id": 3,
-            "name": "Melih Tosun",
-            "email": "melih.tosun@arcelik.com",
-            "role": "INTERN",
-        },
-    ]
+  constructor(
+    @InjectModel(User.name)
+    private UserModel: mongoose.Model<User>,
+  ) {}
 
-    findAll(role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
-        console.log("role is: " , role);
-        if (role) {
-            const rolesArray = this.users.filter(user => user.role === role)
-            if (rolesArray.length === 0) throw new NotFoundException("User role Not found")
-            return rolesArray;
-        }
-        return this.users;
+  async findAll(role?: 'INTERN' | 'ENGINEER' | 'ADMIN'): Promise<User[]> {
+    console.log('role is: ', role);
+    if (role) {
+      const rolesArray = await this.UserModel.find({ roles: role }).exec();
+      if (rolesArray.length === 0 || !rolesArray) {
+        throw new NotFoundException('User role Not found');
+      }
+      return rolesArray;
     }
+    return;
+  }
 
-    findOne(id: number) {
-        const user = this.users.find(user => user.id === id)
+  async findOne(id: number) {
+    const user = await this.UserModel.findOne({ _id: id }).exec();
 
-        return user;
-    }
+    return user;
+  }
 
-    create(user: CreateUserDto) {
-        const userByHighId = [...this.users].sort((a,b) => b.id = a.id)
-        const newUser = {
-            id: userByHighId[0].id + 1,
-            ...user
-        }
-        this.users.push(newUser)
-        return newUser;
-    }
+  create(user: CreateUserDto) {
+    const newUser = {
+      id: userByHighId[0].id + 1,
+      ...user,
+    };
+    this.users.push(newUser);
+    return newUser;
+  }
 
-    update(id: number, updatedUser: updatedUserDto) {
-        this.users = this.users.map(user => {
-            if (user.id === id) {
-                return {...user, ...updatedUser}
-            }
-            return user;
-        })
+  update(id: number, updatedUser: updatedUserDto) {
+    this.users = this.users.map((user) => {
+      if (user.id === id) {
+        return { ...user, ...updatedUser };
+      }
+      return user;
+    });
 
-        return this.findOne(id)
-    }
+    return this.findOne(id);
+  }
 
-    delete(id: number) {
-        const removedUser = this.findOne(id)
-        
-        this.users = this.users.filter(user => user.id !== id)
+  delete(id: number) {
+    const removedUser = this.findOne(id);
 
-        return removedUser;
-    }
+    this.users = this.users.filter((user) => user.id !== id);
+
+    return removedUser;
+  }
 }
-
-    

@@ -8,16 +8,22 @@ import mongoose from 'mongoose';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({isGlobal: true}),
-    MongooseModule.forRoot(`${process.env.MONGO_URI}:${process.env.MONGO_PORT}`),
+    ConfigModule.forRoot({
+      envFilePath: '.env',
+      isGlobal: true,
+    }),
+    MongooseModule.forRoot(
+      `${process.env.MONGO_URI}:${process.env.MONGO_PORT}`,
+    ),
     UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-
 export class AppModule {
   constructor() {
-    console.log(`DB is working on ${process.env.MONGO_PORT}`)
+    console.log(`DB is working on ${process.env.MONGO_PORT}`);
   }
 }
+
+//Module is for configuration

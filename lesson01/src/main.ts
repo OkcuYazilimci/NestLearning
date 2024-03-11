@@ -6,6 +6,6 @@ async function bootstrap() {
   dotenv.config();
   const app = await NestFactory.create(AppModule);
   await app.listen(3000);
-  console.log("app is listening on 3000")
+  console.log('app is listening on 3000');
 }
 bootstrap();
