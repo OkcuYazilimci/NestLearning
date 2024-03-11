@@ -1,9 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { updatedUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Roles, User } from './users.schema';
-import mongoose from 'mongoose';
+import mongoose, { isValidObjectId } from 'mongoose';
 
 @Injectable() //attach meta data
 export class UsersService {
@@ -30,7 +30,10 @@ export class UsersService {
   }
 
   async findOne(id: string) {
+    if(!isValidObjectId(id)) throw new BadRequestException('Invalid ID')
+
     const user = await this.UserModel.findOne({ _id: id }).lean().exec();
+    if (!user) throw new NotFoundException('User not found');
 
     return user;
   }
