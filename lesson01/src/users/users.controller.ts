@@ -13,6 +13,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { updatedUserDto } from './dto/update-user.dto';
+import { User } from './users.schema';
 
 @Controller('users')
 export class UsersController {
@@ -27,14 +28,19 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  async getAllUsers(): Promise<User[]> {
+    return this.usersService.findAll();
+  }
+
+  @Get()
   findAll(@Query('role') role?: 'INTERN' | 'ENGINEER' | 'ADMIN') {
     console.log('role in cont: ', role);
-    return [this.usersService.findAll(role)];
+    return [this.usersService.findByRole(role)];
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.findOne(id);
   }
 
   @Post()
@@ -46,11 +52,11 @@ export class UsersController {
     return this.usersService.create(user);
   }
 
-  @Patch(':id')
+  /*@Patch(':id')
   patchUser(
     @Param('id') id: string,
     @Body() userUpdate: updatedUserDto /*{ name?: string,
-    email?: string, role?: 'INTERN' |'ENGINEER' | 'ADMIN'}*/,
+    email?: string, role?: 'INTERN' |'ENGINEER' | 'ADMIN'}*//*,
   ) {
     console.log('/:id is: ', id);
     return { id, ...userUpdate };
@@ -60,5 +66,5 @@ export class UsersController {
   deleteUser(@Param('id') id: string, @Body() userDelete: {}) {
     return this.usersService.delete(+id); //+ is the unary (+) for
     //converting to number
-  }
+  }*/
 }

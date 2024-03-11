@@ -12,7 +12,12 @@ export class UsersService {
     private UserModel: mongoose.Model<User>,
   ) {}
 
-  async findAll(role?: 'INTERN' | 'ENGINEER' | 'ADMIN'): Promise<User[]> {
+  async findAll(): Promise<User[]> { 
+    const users = await this.UserModel.find();
+    return users;
+  }
+
+  async findByRole(role?: 'INTERN' | 'ENGINEER' | 'ADMIN'): Promise<User[]> {
     console.log('role is: ', role);
     if (role) {
       const rolesArray = await this.UserModel.find({ roles: role }).exec();
@@ -24,22 +29,33 @@ export class UsersService {
     return;
   }
 
-  async findOne(id: number) {
-    const user = await this.UserModel.findOne({ _id: id }).exec();
+  async findOne(id: string) {
+    const user = await this.UserModel.findOne({ _id: id }).lean().exec();
 
     return user;
   }
 
-  create(user: CreateUserDto) {
-    const newUser = {
-      id: userByHighId[0].id + 1,
-      ...user,
-    };
-    this.users.push(newUser);
-    return newUser;
-  }
+  async create(user: CreateUserDto): Promise<User> {
+    const isEmailUnique = await this.isEmailUnique(user.email);
+    if(!isEmailUnique) throw new Error('Email Already exists!') ;
 
-  update(id: number, updatedUser: updatedUserDto) {
+    const newUser: CreateUserDto = {
+      name: user.name,
+      email: user.email,
+      password: user.password,
+    };
+    const res = await this.UserModel.create(newUser);
+    return res; 
+  } 
+
+  async isEmailUnique(email: string): Promise<Boolean> {
+    const emails = await this.UserModel.find({email}).lean().exec();
+
+    return emails.length === 0;
+  }
+}
+
+  /*update(id: number, updatedUser: updatedUserDto) {
     this.users = this.users.map((user) => {
       if (user.id === id) {
         return { ...user, ...updatedUser };
@@ -56,5 +72,4 @@ export class UsersService {
     this.users = this.users.filter((user) => user.id !== id);
 
     return removedUser;
-  }
-}
+  }*/
